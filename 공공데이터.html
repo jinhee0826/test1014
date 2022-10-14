@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공공데이터</title>
+
+    <style>
+        .list {
+            border: solid 1px gray;
+            border-radius: 10px;
+            overflow: hidden;
+            clear: both;
+            padding-bottom: 20px;
+        }
+        .list p {
+            display: inline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>메뉴 리스트 입니다</h1>
+    <h3>식당이름</h3>
+    <p>메뉴카테고리대분류명 - 메뉴이름</p>
+    <button id="addBtn">추가</button>
+
+    <script>
+    
+    async function food(nextCount){
+    const response = await fetch('./공공데이터.json');
+
+    let data = 0;
+    if(response.ok){
+        data = await response.json();
+        console.log(data.body[0].RSTR_NM);
+    }
+
+    const menuResponse = await fetch('./공공데이터.json');
+
+    let menuData = 0;
+    if(menuResponse.ok) {
+        menuData = await menuResponse.json();
+        console.log(menuData);
+        console.log(menuData.body[0].MENU_CTGRY_LCLAS_NM);
+        console.log(menuData.body[0].MENU_NM);
+
+    }
+
+    const menuRe = data.body[0].RSTR_NM;
+    const menuLi = menuData.body[0].MENU_CTGRY_LCLAS_NM;
+    const menuNa = menuData.body[0].MENU_NM;
+
+    function menuTag(menuRe, menuLi, menuNa) {
+        const menuReTag = document.createElement("h3");
+        menuReTag.innerHTML = menuRe;
+        const menuLiTag = document.createElement("p");
+        menuLiTag.innerHTML = menuLi;
+        const menuNaTag = document.createElement("p");
+        menuNaTag.innerHTML = menuNa;
+        
+        const menuBox = document.createElement("div");
+        menuBox.append(menuReTag);
+        menuBox.append(menuLiTag, " - ");
+        menuBox.append(menuNaTag);
+        menuBox.classList.add("list");
+
+        document.querySelector("body").append(menuBox);
+    }
+    for(let i = nextCount; i<nextCount+5; i++){
+        let count = 0;
+        for(let j = i; j<1000; j++){
+            if(menuData.body[j].MENU_ID == data.body[i].MENU_ID){
+                count = j;
+                break;
+            }
+        }
+        menuTag(data.body[i].RSTR_NM, 
+                menuData.body[count].MENU_CTGRY_LCLAS_NM, 
+                menuData.body[count].MENU_NM);
+    }
+}
+
+food(0);
+
+let nextCount = 0; 
+let button = document.querySelector("#addBtn");
+button.addEventListener("click",()=> {
+    nextCount += 5;
+    food(nextCount)
+});
+</script>
+
+</body>
+
+
+</html>
